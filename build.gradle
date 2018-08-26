@@ -1,7 +1,5 @@
 // project-wide `build.gradle` for io.syslogic.streetviewmotion
 
-// project-wide `build.gradle` for io.syslogic.MPOS
-
 // Build Configurations
 project.ext.set('archiveBuildTypes', ['release', 'debug'])
 
