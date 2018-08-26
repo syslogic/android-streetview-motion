@@ -21,16 +21,6 @@ def apikeys = new Properties()
 apikeys.load(new FileInputStream(rootProject.file('apikeys.properties')))
 project.ext.set('googleMapsApiKey', apikeys['googleMapsApiKey'])
 
-// Keystore Settings, loaded from keystore.properties
-def keystore = new Properties()
-keystore.load(new FileInputStream(rootProject.file('keystore.properties')))
-project.ext.set('debugKeystorePass',   keystore['debugKeystorePass'])
-project.ext.set('debugKeyAlias',       keystore['debugKeyAlias'])
-project.ext.set('debugKeyPass',        keystore['debugKeyPass'])
-project.ext.set('releaseKeystorePass', keystore['releaseKeystorePass'])
-project.ext.set('releaseKeyAlias',     keystore['releaseKeyAlias'])
-project.ext.set('releaseKeyPass',      keystore['releaseKeyPass'])
-
 buildscript {
     repositories {
         google()
