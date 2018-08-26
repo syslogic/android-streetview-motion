@@ -15,6 +15,7 @@ project.ext.set('compileSdkVersion',   new Integer(version['compileSdkVersion'])
 project.ext.set('targetSdkVersion',    new Integer(version['targetSdkVersion']))
 project.ext.set('minSdkVersion',       new Integer(version['minSdkVersion']))
 
+// Google Maps API Settings, loaded from apikeys.properties
 def apikeys = new Properties()
 apikeys.load(new FileInputStream(rootProject.file('apikeys.properties')))
 project.ext.set('googleMapsApiKey', apikeys['googleMapsApiKey'])
