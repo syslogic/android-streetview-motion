@@ -1,0 +1,69 @@
+// module :mobile
+
+def googleMapsApiKey    = rootProject.ext.get("googleMapsApiKey")
+def supportLibVersion   = rootProject.ext.get("supportLibVersion")
+def playServicesVersion = rootProject.ext.get("playServicesVersion")
+
+apply plugin: 'com.android.application'
+
+android {
+
+    defaultConfig {
+        applicationId rootProject.ext.get('applicationId')
+        versionName rootProject.ext.get('versionName')
+        versionCode rootProject.ext.get('versionCode')
+        compileSdkVersion rootProject.ext.get('compileSdkVersion')
+        targetSdkVersion rootProject.ext.get('targetSdkVersion')
+        minSdkVersion rootProject.ext.get('minSdkVersion')
+        manifestPlaceholders = [ crashlyticsEnabled: false, googleMapsApiKey: "" ]
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+
+        debug {
+            // applicationIdSuffix '.debug'
+            // signingConfig signingConfigs.debug
+            manifestPlaceholders = [googleMapsApiKey: "${googleMapsApiKey}"]
+            testCoverageEnabled = false
+            minifyEnabled false
+            debuggable true
+            jniDebuggable true
+            zipAlignEnabled true
+            renderscriptDebuggable true
+            pseudoLocalesEnabled false
+            shrinkResources false
+        }
+
+        release {
+            // signingConfig signingConfigs.release
+            manifestPlaceholders = [googleMapsApiKey: "${googleMapsApiKey}"]
+            proguardFile "${project.rootDir}/proguard/default.pro"
+            testCoverageEnabled false
+            minifyEnabled true
+            zipAlignEnabled true
+            shrinkResources true
+            pseudoLocalesEnabled false
+            renderscriptDebuggable false
+            jniDebuggable false
+            debuggable false
+        }
+    }
+}
+
+dependencies {
+    implementation "com.android.support:appcompat-v7:${supportLibVersion}"
+    implementation "com.android.support:support-v4:${supportLibVersion}"
+    implementation "com.android.support:support-media-compat:${supportLibVersion}"
+    implementation "com.google.android.gms:play-services-location:${playServicesVersion}"
+    implementation ("com.google.android.gms:play-services-maps:${playServicesVersion}") {
+        exclude group: "com.google.android.gms", module: "support-media-compat"
+        exclude group: "com.android.support", module: "support-v4"
+    }
+    testImplementation "junit:junit:4.12"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:3.0.2"
+    androidTestImplementation "com.android.support.test:runner:1.0.2"
+}
+
+configurations.all() {
+    resolutionStrategy.force "com.android.support:media-compat:${supportLibVersion}"
+}

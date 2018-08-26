@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">StreetView Motion</string>
+    <string name="title_activity_street_view">Google StreetView</string>
+</resources>

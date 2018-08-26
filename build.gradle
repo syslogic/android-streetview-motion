@@ -1,0 +1,66 @@
+// project-wide `build.gradle` for io.syslogic.streetviewmotion
+
+// project-wide `build.gradle` for io.syslogic.MPOS
+
+// Build Configurations
+project.ext.set('archiveBuildTypes', ['release', 'debug'])
+
+// Version Settings, loaded from version.properties
+def version = new Properties()
+version.load(new FileInputStream(rootProject.file('version.properties')))
+project.ext.set('applicationId',       version['applicationId'])
+project.ext.set('versionName',         version['versionName'])
+project.ext.set('supportLibVersion',   version['supportLibVersion'])
+project.ext.set('playServicesVersion', version['playServicesVersion'])
+project.ext.set('versionCode',         new Integer(version['versionCode']))
+project.ext.set('compileSdkVersion',   new Integer(version['compileSdkVersion']))
+project.ext.set('targetSdkVersion',    new Integer(version['targetSdkVersion']))
+project.ext.set('minSdkVersion',       new Integer(version['minSdkVersion']))
+
+def apikeys = new Properties()
+apikeys.load(new FileInputStream(rootProject.file('apikeys.properties')))
+project.ext.set('googleMapsApiKey', apikeys['googleMapsApiKey'])
+
+// Keystore Settings, loaded from keystore.properties
+def keystore = new Properties()
+keystore.load(new FileInputStream(rootProject.file('keystore.properties')))
+project.ext.set('debugKeystorePass',   keystore['debugKeystorePass'])
+project.ext.set('debugKeyAlias',       keystore['debugKeyAlias'])
+project.ext.set('debugKeyPass',        keystore['debugKeyPass'])
+project.ext.set('releaseKeystorePass', keystore['releaseKeystorePass'])
+project.ext.set('releaseKeyAlias',     keystore['releaseKeyAlias'])
+project.ext.set('releaseKeyPass',      keystore['releaseKeyPass'])
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.4'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+// rootProject > clean
+task clean(type: Delete) {
+
+    // delete build directories
+    delete rootProject.buildDir
+    delete project.buildDir
+
+    // when task clean has finished
+    doLast {
+
+        // then recreate APK output directories
+        mkdir("${project.buildDir}/outputs/apk")
+        mkdir("${project.buildDir}/outputs/apk/debug")
+        mkdir("${project.buildDir}/outputs/apk/release")
+    }
+}
