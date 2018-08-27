@@ -8,7 +8,7 @@ It is required to add a Google Maps API key into file `apikeys.properties`.
 
 Hint: disabling the device's screen auto-rotation is being recommended,
 
-else the screen will rotate when tilting the device to a certain angle.
+else the screen will rotate, when tilting the device to a steep angle.
 
 ## Built With
 * [Android Studio](https://developer.android.com/studio/) (Development Environment)
