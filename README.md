@@ -11,4 +11,4 @@ Hint: Disabling the device's screen auto-rotation is suggested, else the screen 
 ## Built With
 * [Android Studio](https://developer.android.com/studio/) (Development Environment)
 * [Google Android SDK](https://developer.android.com/studio/releases/platforms) (Software Development Kit)
-* [Google Maps API](https://developers.google.com/maps/documentation/android-sdk/streetview) (Street View)
+* [Google Maps API](https://developers.google.com/maps/documentation/android-sdk/streetview) (Street View Panorama)
