@@ -6,7 +6,9 @@ This example application uses hardware sensors to control a Google Maps StreetVi
 
 It is required to add a Google Maps API key into file `apikeys.properties`.
 
-Hint: Disabling the device's screen auto-rotation is suggested, else the screen will rotate when tilting the device to a certain angle.
+Hint: disabling the device's screen auto-rotation is being recommended,
+
+else the screen will rotate when tilting the device to a certain angle.
 
 ## Built With
 * [Android Studio](https://developer.android.com/studio/) (Development Environment)
