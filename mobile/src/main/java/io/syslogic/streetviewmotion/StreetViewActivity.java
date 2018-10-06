@@ -43,7 +43,6 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
     private SensorManager mSensorManager = null;
     private Sensor mSensor;
 
-    // private int sensorType = Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR;
     private int sensorType = Sensor.TYPE_GAME_ROTATION_VECTOR;
 
     private final float[] mAccelerometerReading = new float[3];

@@ -54,8 +54,8 @@ dependencies {
     implementation "com.android.support:appcompat-v7:${supportLibVersion}"
     implementation "com.android.support:support-v4:${supportLibVersion}"
     implementation "com.android.support:support-media-compat:${supportLibVersion}"
-    implementation "com.google.android.gms:play-services-location:${playServicesVersion}"
-    implementation ("com.google.android.gms:play-services-maps:${playServicesVersion}") {
+    implementation "com.google.android.gms:play-services-location:16.0.0"
+    implementation ("com.google.android.gms:play-services-maps:15.0.1") {
         exclude group: "com.google.android.gms", module: "support-media-compat"
         exclude group: "com.android.support", module: "support-v4"
     }
