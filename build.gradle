@@ -9,7 +9,7 @@ version.load(new FileInputStream(rootProject.file('version.properties')))
 project.ext.set('applicationId',       version['applicationId'])
 project.ext.set('versionName',         version['versionName'])
 project.ext.set('supportLibVersion',   version['supportLibVersion'])
-project.ext.set('playServicesVersion', version['playServicesVersion'])
+project.ext.set('buildToolsVersion',   version['buildToolsVersion'])
 project.ext.set('versionCode',         new Integer(version['versionCode']))
 project.ext.set('compileSdkVersion',   new Integer(version['compileSdkVersion']))
 project.ext.set('targetSdkVersion',    new Integer(version['targetSdkVersion']))
@@ -26,7 +26,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.0'
+        classpath 'com.android.tools.build:gradle:3.2.1'
     }
 }
 

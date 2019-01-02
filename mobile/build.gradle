@@ -2,7 +2,6 @@
 
 def googleMapsApiKey    = rootProject.ext.get("googleMapsApiKey")
 def supportLibVersion   = rootProject.ext.get("supportLibVersion")
-def playServicesVersion = rootProject.ext.get("playServicesVersion")
 
 apply plugin: 'com.android.application'
 
@@ -10,6 +9,7 @@ android {
 
     defaultConfig {
         applicationId rootProject.ext.get('applicationId')
+        buildToolsVersion rootProject.ext.get("buildToolsVersion")
         versionName rootProject.ext.get('versionName')
         versionCode rootProject.ext.get('versionCode')
         compileSdkVersion rootProject.ext.get('compileSdkVersion')
