@@ -11,6 +11,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.util.Log;
 import android.widget.Toast;
 import android.os.Bundle;
@@ -231,8 +232,8 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
         this.currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
     }
 
+    /** This callback will never be invoked and providers can be considers as always in the {@link LocationProvider#AVAILABLE} state. */
     @Override
-    @Deprecated
     public void onStatusChanged(String provider, int status, Bundle extras) {
         if(mDebug) {Log.d(LOG_TAG, provider + ".onStatusChanged()");}
     }
