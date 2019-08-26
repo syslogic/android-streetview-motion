@@ -11,9 +11,6 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.widget.Toast;
 import android.os.Bundle;
@@ -26,6 +23,15 @@ import com.google.android.gms.maps.model.StreetViewPanoramaLocation;
 import com.google.android.gms.maps.model.StreetViewPanoramaOrientation;
 import com.google.android.gms.maps.model.LatLng;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentActivity;
+
+/**
+ * StreetView {@link FragmentActivity}
+ * @author Martin Zeitler
+ * @version 1.0.0
+**/
 public class StreetViewActivity extends FragmentActivity implements LocationListener, SensorEventListener, StreetViewPanorama.OnStreetViewPanoramaChangeListener, StreetViewPanorama.OnStreetViewPanoramaCameraChangeListener, StreetViewPanorama.OnStreetViewPanoramaClickListener, StreetViewPanorama.OnStreetViewPanoramaLongClickListener {
 
     /** {@link Log} Tag */
@@ -221,11 +227,12 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
     /** start: LocationListener */
     @Override
     public void onLocationChanged(Location location) {
-        if(mDebug) {Log.d(LOG_TAG, "onLocationChanged(" + String.valueOf(location.getLatitude()) + ", " + String.valueOf(location.getLongitude()) + ")");}
+        if(mDebug) {Log.d(LOG_TAG, "onLocationChanged(" + location.getLatitude() + ", " + location.getLongitude() + ")");}
         this.currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
     }
 
     @Override
+    @Deprecated
     public void onStatusChanged(String provider, int status, Bundle extras) {
         if(mDebug) {Log.d(LOG_TAG, provider + ".onStatusChanged()");}
     }
@@ -269,7 +276,7 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
 
     /** Permissions */
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case 200:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
