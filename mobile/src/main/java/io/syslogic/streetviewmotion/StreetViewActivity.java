@@ -233,12 +233,13 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
         this.currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
     }
 
-    /** This callback will never be invoked and providers can be considers as always in the {@link LocationProvider#AVAILABLE} state. */
+    /**
+     * Notice: This callback will never be invoked and providers can be
+     * considered as always in the {@link LocationProvider#AVAILABLE} state.
+     */
     @Override
     @SuppressWarnings("deprecation")
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        if(mDebug) {Log.d(LOG_TAG, provider + ".onStatusChanged()");}
-    }
+    public void onStatusChanged(String provider, int status, Bundle extras) {}
 
     @Override
     public void onProviderEnabled(String provider) {
