@@ -25,7 +25,8 @@
 
         <activity
             android:name=".StreetViewActivity"
-            android:label="@string/title_activity_street_view">
+            android:label="@string/title_activity_street_view"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <action android:name="android.intent.action.VIEW"/>

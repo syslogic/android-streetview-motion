@@ -21,10 +21,10 @@ project.ext.set('googleMapsApiKey', apikeys['googleMapsApiKey'])
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.0'
+        classpath 'com.android.tools.build:gradle:7.0.1'
     }
 }
 
@@ -32,7 +32,7 @@ allprojects {
 
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
     // when projects were evaluated

@@ -1,6 +1,7 @@
 package io.syslogic.streetviewmotion;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
@@ -234,6 +235,7 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
 
     /** This callback will never be invoked and providers can be considers as always in the {@link LocationProvider#AVAILABLE} state. */
     @Override
+    @SuppressWarnings("deprecation")
     public void onStatusChanged(String provider, int status, Bundle extras) {
         if(mDebug) {Log.d(LOG_TAG, provider + ".onStatusChanged()");}
     }
