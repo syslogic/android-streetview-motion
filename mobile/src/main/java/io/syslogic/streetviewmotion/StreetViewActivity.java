@@ -29,9 +29,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
 
 /**
- * StreetView {@link FragmentActivity}
+ * StreetView {@link FragmentActivity}.
+ * TODO: It should test for network connectivity.
  * @author Martin Zeitler
- * @version 1.0.0
+ * @version 1.0.1
 **/
 public class StreetViewActivity extends FragmentActivity implements LocationListener, SensorEventListener, StreetViewPanorama.OnStreetViewPanoramaChangeListener, StreetViewPanorama.OnStreetViewPanoramaCameraChangeListener, StreetViewPanorama.OnStreetViewPanoramaClickListener, StreetViewPanorama.OnStreetViewPanoramaLongClickListener {
 
@@ -48,7 +49,7 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
     private StreetViewPanorama panorama = null;
     private LocationManager mLocationManager = null;
     private SensorManager mSensorManager = null;
-    private Sensor mSensor;
+    private Sensor mRotationSensor;
 
     private final float[] mAccelerometerReading = new float[3];
     private final float[] mMagnetometerReading = new float[3];
@@ -76,25 +77,23 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
 
         /* Street-View */
         SupportStreetViewPanoramaFragment fragment = (SupportStreetViewPanoramaFragment) getSupportFragmentManager().findFragmentById(this.resIdLayout);
-        assert fragment != null;
+        if (fragment != null && this.panorama == null) {
+            fragment.getStreetViewPanoramaAsync(streetViewPanorama -> { // OnStreetViewPanoramaReadyCallback
 
-        fragment.getStreetViewPanoramaAsync(streetViewPanorama -> { // OnStreetViewPanoramaReadyCallback
+                this.panorama = streetViewPanorama;
+                // this.panorama.setUserNavigationEnabled(false);
+                // this.panorama.setPanningGesturesEnabled(false);
+                this.panorama.setOnStreetViewPanoramaCameraChangeListener(StreetViewActivity.this);
+                this.panorama.setOnStreetViewPanoramaCameraChangeListener(StreetViewActivity.this);
+                this.panorama.setOnStreetViewPanoramaLongClickListener(StreetViewActivity.this);
+                this.panorama.setOnStreetViewPanoramaClickListener(StreetViewActivity.this);
 
-            this.panorama = streetViewPanorama;
-
-            // this.panorama.setUserNavigationEnabled(false);
-            // this.panorama.setPanningGesturesEnabled(false);
-
-            this.panorama.setOnStreetViewPanoramaCameraChangeListener(StreetViewActivity.this);
-            this.panorama.setOnStreetViewPanoramaCameraChangeListener(StreetViewActivity.this);
-            this.panorama.setOnStreetViewPanoramaLongClickListener(StreetViewActivity.this);
-            this.panorama.setOnStreetViewPanoramaClickListener(StreetViewActivity.this);
-
-            /* Set the panorama to the default location upon startup */
-            if (savedInstanceState == null) {
-                this.panorama.setPosition(this.currentLocation, StreetViewSource.DEFAULT);
-            }
-        });
+                /* Set the panorama to the default location upon startup */
+                if (savedInstanceState == null) {
+                    this.panorama.setPosition(this.currentLocation, StreetViewSource.DEFAULT);
+                }
+            });
+        }
 
         /* GPS */
         this.mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -109,9 +108,8 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
         /* Sensors */
         this.mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (this.mSensorManager != null) {
-            int sensorType = Sensor.TYPE_GAME_ROTATION_VECTOR;
-            this.mSensor = this.mSensorManager.getDefaultSensor(sensorType);
-            this.mSensorManager.registerListener(this, this.mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+            this.mRotationSensor = this.mSensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
+            this.mSensorManager.registerListener(this, this.mRotationSensor, SensorManager.SENSOR_DELAY_UI);
         }
     }
 
@@ -126,6 +124,11 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
     @Override
     protected void onResume() {
         super.onResume();
+
+        this.mRotationSensor = this.mSensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
+        this.mSensorManager.registerListener(this, this.mRotationSensor, SensorManager.SENSOR_DELAY_UI);
+
+        /*
         Sensor accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         if (accelerometer != null) {
             this.mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
@@ -134,6 +137,7 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
         if (magneticField != null) {
             this.mSensorManager.registerListener(this, magneticField, SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
         }
+        */
     }
 
     /** Sensor Changed */
@@ -220,7 +224,7 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
     /** GPS onLocationChanged() */
     @Override
     public void onLocationChanged(Location location) {
-        if(mDebug) {Log.d(LOG_TAG, "onLocationChanged(" + location.getLatitude() + ", " + location.getLongitude() + ")");}
+        if(mDebug) {Log.d(LOG_TAG, "onLocationChanged() -> " + location.getLatitude() + ", " + location.getLongitude());}
         this.currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
         // The problem is that not every GPS location does have a street-view available.
