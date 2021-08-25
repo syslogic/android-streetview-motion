@@ -12,6 +12,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.net.ConnectivityManager;
 import android.util.Log;
 import android.widget.Toast;
 import android.os.Bundle;
@@ -30,7 +31,6 @@ import androidx.fragment.app.FragmentActivity;
 
 /**
  * StreetView {@link FragmentActivity}.
- * TODO: It should test for network connectivity.
  * @author Martin Zeitler
  * @version 1.0.1
 **/
@@ -51,6 +51,8 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
     private SensorManager mSensorManager = null;
     private Sensor mRotationSensor;
 
+
+    private final float[] mRotationReading = new float[3];
     private final float[] mAccelerometerReading = new float[3];
     private final float[] mMagnetometerReading = new float[3];
     private final float[] mOrientationAngles = new float[3];
@@ -67,7 +69,6 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
 
     private final int LOCATION_REFRESH_TIME = 1000;
     private final int LOCATION_REFRESH_DISTANCE = 10;
-
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -105,12 +106,16 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
             }
         }
 
-        /* Sensors */
-        this.mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        if (this.mSensorManager != null) {
-            this.mRotationSensor = this.mSensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
-            this.mSensorManager.registerListener(this, this.mRotationSensor, SensorManager.SENSOR_DELAY_UI);
+        /* Network */
+        if (! this.isConnected()) {
+            Toast.makeText(StreetViewActivity.this, "A network connection is required", Toast.LENGTH_LONG).show();
         }
+    }
+
+    boolean isConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        android.net.NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
     @Override
@@ -121,23 +126,26 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
         }
     }
 
+    /** Registering the listeners for the Sensors */
     @Override
     protected void onResume() {
         super.onResume();
+        this.mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        if (this.mSensorManager != null) {
 
-        this.mRotationSensor = this.mSensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
-        this.mSensorManager.registerListener(this, this.mRotationSensor, SensorManager.SENSOR_DELAY_UI);
+            this.mRotationSensor = this.mSensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
+            this.mSensorManager.registerListener(this, this.mRotationSensor, SensorManager.SENSOR_DELAY_UI);
 
-        /*
-        Sensor accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        if (accelerometer != null) {
-            this.mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
+            Sensor accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            if (accelerometer != null) {
+                this.mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
+            }
+
+            Sensor magneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+            if (magneticField != null) {
+                this.mSensorManager.registerListener(this, magneticField, SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
+            }
         }
-        Sensor magneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-        if (magneticField != null) {
-            this.mSensorManager.registerListener(this, magneticField, SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
-        }
-        */
     }
 
     /** Sensor Changed */
@@ -145,6 +153,9 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
     public void onSensorChanged(SensorEvent event) {
 
         switch (event.sensor.getType()) {
+            case Sensor.TYPE_GAME_ROTATION_VECTOR:
+                System.arraycopy(event.values, 0, mRotationReading, 0, mRotationReading.length);
+                break;
             case Sensor.TYPE_ACCELEROMETER:
                 System.arraycopy(event.values, 0, mAccelerometerReading, 0, mAccelerometerReading.length);
                 break;
@@ -172,16 +183,22 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
             float z = 0.0f;
             switch (event.sensor.getType()) {
 
+                case Sensor.TYPE_GAME_ROTATION_VECTOR:
+                    // x = this.mRotationReading[0];
+                    // y = this.mRotationReading[1];
+                    // z = this.mRotationReading[2];
+                    break;
+
                 case Sensor.TYPE_ACCELEROMETER:
                     x = this.mAccelerometerReading[0];
                     y = this.mAccelerometerReading[1];
-                    z = this.mAccelerometerReading[2];
+                    // z = this.mAccelerometerReading[2];
                     break;
 
                 case Sensor.TYPE_MAGNETIC_FIELD:
-                    x = this.mMagnetometerReading[0];
-                    y = this.mMagnetometerReading[1];
-                    z = this.mMagnetometerReading[2];
+                    // x = this.mMagnetometerReading[0];
+                    // y = this.mMagnetometerReading[1];
+                    // z = this.mMagnetometerReading[2];
                     break;
             }
 
@@ -242,14 +259,20 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
     /** GPS: When the sensor had been enabled. */
     @Override
     public void onProviderEnabled(String provider) {
-        if(mDebug) {Log.d(LOG_TAG, provider + ".onProviderEnabled()");}
+        if(mDebug) {
+            Toast.makeText(StreetViewActivity.this, provider.toUpperCase() + " enabled.", Toast.LENGTH_SHORT).show();
+            Log.d(LOG_TAG, provider + ".onProviderEnabled(\"" + provider.toUpperCase() + "\")");
+        }
         this.requestLocationUpdates();
     }
 
     /** GPS: When the sensor had been disabled. */
     @Override
     public void onProviderDisabled(String provider) {
-        if(mDebug) {Log.d(LOG_TAG, provider + ".onProviderDisabled()");}
+        if(mDebug) {
+            Toast.makeText(StreetViewActivity.this, provider.toUpperCase() + " disabled.", Toast.LENGTH_SHORT).show();
+            Log.d(LOG_TAG, provider + ".onProviderDisabled(\"" + provider.toUpperCase() + "\")");
+        }
         this.mLocationManager.removeUpdates(this);
     }
 
