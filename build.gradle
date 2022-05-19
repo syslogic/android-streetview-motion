@@ -1,5 +1,10 @@
 // project-wide `build.gradle` for io.syslogic.streetviewmotion
 
+plugins {
+    id 'com.android.application' version '7.2.0' apply false
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin' version '2.0.1' apply false
+}
+
 // Build Configurations
 project.ext.set('archiveBuildTypes', ['release', 'debug'])
 
@@ -13,27 +18,7 @@ project.ext.set('compileSdkVersion',   new Integer(version['compileSdkVersion'])
 project.ext.set('targetSdkVersion',    new Integer(version['targetSdkVersion']))
 project.ext.set('minSdkVersion',       new Integer(version['minSdkVersion']))
 
-// Google Maps API Settings, loaded from apikeys.properties
-def apikeys = new Properties()
-apikeys.load(new FileInputStream(rootProject.file('apikeys.properties')))
-project.ext.set('googleMapsApiKey', apikeys['googleMapsApiKey'])
-
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.2'
-    }
-}
-
 allprojects {
-
-    repositories {
-        google()
-        mavenCentral()
-    }
 
     // when projects were evaluated
     gradle.projectsEvaluated {

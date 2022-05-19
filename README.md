@@ -4,10 +4,9 @@ This example application uses hardware sensors to control a Google Maps StreetVi
 
 ## Setup
 
-It is required to add a Google Maps API key into file `apikeys.properties`.
+It is required to add a Google Maps API key into file `local.properties` as `MAPS_API_KEY=...`.
 
-Hint: disabling the device's screen auto-rotation is being recommended,
-
+Hint: disabling the device's screen auto-rotation is being recommended,<br/>
 else the screen will rotate, when tilting the device to a steep angle.
 
 ## Built With
