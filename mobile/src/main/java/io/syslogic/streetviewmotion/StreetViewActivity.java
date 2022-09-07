@@ -74,20 +74,18 @@ public class StreetViewActivity extends FragmentActivity
     private StreetViewPanoramaOrientation currentOrientation;
     private LatLng currentLocation;
 
-    private float currentZoom    = 0.0f;
     private float currentBearing = 0;
-    private float currentTilt    = 30;
+    private float currentTilt    = 0;
 
     private final int LOCATION_REFRESH_TIME = 1000;
     private final int LOCATION_REFRESH_DISTANCE = 10;;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        this.prefs = PreferenceManager.getDefaultSharedPreferences(this);
         this.setContentView(this.resId);
 
+        this.prefs = PreferenceManager.getDefaultSharedPreferences(this);
         double latitude = this.prefs.getFloat(Constants.PREFERENCE_KEY_LATITUDE, 48.1429469F);
         double longitude = this.prefs.getFloat(Constants.PREFERENCE_KEY_LONGITUDE, 11.5800361F);
         this.currentLocation = new LatLng(latitude, longitude);
@@ -229,12 +227,12 @@ public class StreetViewActivity extends FragmentActivity
                     /* no clue why bearing-x & tilt+y, but it works */
                     this.currentBearing = camera.bearing -x; // pitch
                     this.currentTilt = camera.tilt + y; // roll
-                    this.currentZoom = camera.zoom;
+                    float currentZoom = camera.zoom;
 
                     this.panorama.animateTo(new StreetViewPanoramaCamera
                         .Builder()
                         .orientation(this.currentOrientation)
-                        .zoom(this.currentZoom)
+                        .zoom(currentZoom)
                         .bearing(this.currentBearing)
                         .tilt(this.currentTilt)
                         .build(),0
@@ -259,15 +257,14 @@ public class StreetViewActivity extends FragmentActivity
     /** GPS onLocationChanged() */
     @Override
     public void onLocationChanged(Location location) {
-        if(mDebug) {Log.d(LOG_TAG, "onLocationChanged() -> " + location.getLatitude() + ", " + location.getLongitude());}
-        this.currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-
+        if (mDebug) {Log.d(LOG_TAG, "onLocationChanged() -> " + location.getLatitude() + ", " + location.getLongitude());}
         this.prefs.edit()
                 .putFloat(Constants.PREFERENCE_KEY_LATITUDE, (float) location.getLatitude())
                 .putFloat(Constants.PREFERENCE_KEY_LONGITUDE, (float) location.getLongitude())
                 .apply();
 
         // The problem is that not every GPS location does have a street-view available.
+        this.currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
         if (this.panorama != null) {this.panorama.setPosition(this.currentLocation);}
     }
 
