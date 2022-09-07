@@ -50,13 +50,6 @@ public class StreetViewActivity extends FragmentActivity
     /** Debug Output */
     protected static final boolean mDebug = BuildConfig.DEBUG;
 
-    /** resIds */
-    @SuppressWarnings("FieldCanBeLocal")
-    private final int resId = R.layout.fragment_street_view;
-
-    @SuppressWarnings("FieldCanBeLocal")
-    private final int resIdLayout = R.id.street_view_panorama;
-
     /** Shared Preferences */
     private SharedPreferences prefs;
 
@@ -83,15 +76,15 @@ public class StreetViewActivity extends FragmentActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(this.resId);
+        this.setContentView(R.layout.fragment_street_view);
 
         this.prefs = PreferenceManager.getDefaultSharedPreferences(this);
         double latitude = this.prefs.getFloat(Constants.PREFERENCE_KEY_LATITUDE, 48.1429469F);
         double longitude = this.prefs.getFloat(Constants.PREFERENCE_KEY_LONGITUDE, 11.5800361F);
         this.currentLocation = new LatLng(latitude, longitude);
 
-        /* Street-View */
-        SupportStreetViewPanoramaFragment fragment = (SupportStreetViewPanoramaFragment) getSupportFragmentManager().findFragmentById(this.resIdLayout);
+        /* Street-View Panorama Fragment */
+        SupportStreetViewPanoramaFragment fragment = (SupportStreetViewPanoramaFragment) getSupportFragmentManager().findFragmentById(R.id.street_view_panorama);
         if (fragment != null && this.panorama == null) {
             fragment.getStreetViewPanoramaAsync(streetViewPanorama -> { // OnStreetViewPanoramaReadyCallback
 
@@ -279,7 +272,7 @@ public class StreetViewActivity extends FragmentActivity
     /** GPS: When the sensor had been enabled. */
     @Override
     public void onProviderEnabled(String provider) {
-        if(mDebug) {
+        if (mDebug) {
             Toast.makeText(StreetViewActivity.this, provider.toUpperCase() + " enabled.", Toast.LENGTH_SHORT).show();
             Log.d(LOG_TAG, provider + ".onProviderEnabled(\"" + provider.toUpperCase() + "\")");
         }
@@ -290,7 +283,7 @@ public class StreetViewActivity extends FragmentActivity
     @Override
     @SuppressLint("MissingPermission")
     public void onProviderDisabled(String provider) {
-        if(mDebug) {
+        if (mDebug) {
             Toast.makeText(StreetViewActivity.this, provider.toUpperCase() + " disabled.", Toast.LENGTH_SHORT).show();
             Log.d(LOG_TAG, provider + ".onProviderDisabled(\"" + provider.toUpperCase() + "\")");
         }
@@ -299,12 +292,12 @@ public class StreetViewActivity extends FragmentActivity
 
     /** start: StreetViewPanorama */
     @Override
-    public void onStreetViewPanoramaChange(StreetViewPanoramaLocation location) {
+    public void onStreetViewPanoramaChange(@NonNull StreetViewPanoramaLocation location) {
         this.currentLocation = location.position;
     }
 
     @Override
-    public void onStreetViewPanoramaCameraChange(StreetViewPanoramaCamera camera) {
+    public void onStreetViewPanoramaCameraChange(@NonNull StreetViewPanoramaCamera camera) {
         this.currentOrientation = camera.getOrientation();
     }
 
@@ -323,8 +316,7 @@ public class StreetViewActivity extends FragmentActivity
         this.updateZoom(orientation, zoomLevel);
     }
 
-
-    /** Permissions */
+    /** Request Permissions Result */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
