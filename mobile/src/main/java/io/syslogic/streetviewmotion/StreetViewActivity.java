@@ -1,7 +1,9 @@
 package io.syslogic.streetviewmotion;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.hardware.Sensor;
@@ -28,13 +30,19 @@ import com.google.android.gms.maps.model.StreetViewSource;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.preference.PreferenceManager;
 
 /**
- * StreetView {@link FragmentActivity}.
+ * StreetView {@link FragmentActivity}
  * @author Martin Zeitler
  * @version 1.0.1
-**/
-public class StreetViewActivity extends FragmentActivity implements LocationListener, SensorEventListener, StreetViewPanorama.OnStreetViewPanoramaChangeListener, StreetViewPanorama.OnStreetViewPanoramaCameraChangeListener, StreetViewPanorama.OnStreetViewPanoramaClickListener, StreetViewPanorama.OnStreetViewPanoramaLongClickListener {
+ */
+public class StreetViewActivity extends FragmentActivity
+        implements LocationListener, SensorEventListener,
+        StreetViewPanorama.OnStreetViewPanoramaChangeListener,
+        StreetViewPanorama.OnStreetViewPanoramaCameraChangeListener,
+        StreetViewPanorama.OnStreetViewPanoramaClickListener,
+        StreetViewPanorama.OnStreetViewPanoramaLongClickListener {
 
     /** {@link Log} Tag */
     private static final String LOG_TAG = StreetViewActivity.class.getSimpleName();
@@ -43,14 +51,19 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
     protected static final boolean mDebug = BuildConfig.DEBUG;
 
     /** resIds */
-    private final int resId = R.layout.fragment_streetview;
-    private final int resIdLayout = R.id.streetviewpanorama;
+    @SuppressWarnings("FieldCanBeLocal")
+    private final int resId = R.layout.fragment_street_view;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private final int resIdLayout = R.id.street_view_panorama;
+
+    /** Shared Preferences */
+    private SharedPreferences prefs;
 
     private StreetViewPanorama panorama = null;
     private LocationManager mLocationManager = null;
     private SensorManager mSensorManager = null;
     private Sensor mRotationSensor;
-
 
     private final float[] mRotationReading = new float[3];
     private final float[] mAccelerometerReading = new float[3];
@@ -58,23 +71,26 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
     private final float[] mOrientationAngles = new float[3];
     private final float[] mRotationMatrix = new float[9];
 
-    private LatLng currentLocation = new LatLng(48.1429469,11.5800361);
     private StreetViewPanoramaOrientation currentOrientation;
+    private LatLng currentLocation;
+
     private float currentZoom    = 0.0f;
     private float currentBearing = 0;
     private float currentTilt    = 30;
 
-    private int mMagneticFieldAccuracy = 0;
-    private int mGravityAccuracy = 0;
-
     private final int LOCATION_REFRESH_TIME = 1000;
-    private final int LOCATION_REFRESH_DISTANCE = 10;
+    private final int LOCATION_REFRESH_DISTANCE = 10;;
 
     @Override
-    protected void onCreate(final Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        this.prefs = PreferenceManager.getDefaultSharedPreferences(this);
         this.setContentView(this.resId);
+
+        double latitude = this.prefs.getFloat(Constants.PREFERENCE_KEY_LATITUDE, 48.1429469F);
+        double longitude = this.prefs.getFloat(Constants.PREFERENCE_KEY_LONGITUDE, 11.5800361F);
+        this.currentLocation = new LatLng(latitude, longitude);
 
         /* Street-View */
         SupportStreetViewPanoramaFragment fragment = (SupportStreetViewPanoramaFragment) getSupportFragmentManager().findFragmentById(this.resIdLayout);
@@ -112,6 +128,7 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
         }
     }
 
+    @SuppressLint("MissingPermission")
     boolean isConnected() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         android.net.NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
@@ -150,7 +167,7 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
 
     /** Sensor Changed */
     @Override
-    public void onSensorChanged(SensorEvent event) {
+    public void onSensorChanged(@NonNull SensorEvent event) {
 
         switch (event.sensor.getType()) {
             case Sensor.TYPE_GAME_ROTATION_VECTOR:
@@ -159,7 +176,6 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
             case Sensor.TYPE_ACCELEROMETER:
                 System.arraycopy(event.values, 0, mAccelerometerReading, 0, mAccelerometerReading.length);
                 break;
-
             case Sensor.TYPE_MAGNETIC_FIELD:
                 System.arraycopy(event.values, 0, mMagnetometerReading, 0, mMagnetometerReading.length);
                 break;
@@ -230,11 +246,13 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
 
     /** Sensor Accuracy Changed */
     @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    public void onAccuracyChanged(@NonNull Sensor sensor, int accuracy) {
         int SensorType = sensor.getType();
         switch(SensorType) {
-            case Sensor.TYPE_GRAVITY: mGravityAccuracy = accuracy; break;
-            case Sensor.TYPE_MAGNETIC_FIELD: mMagneticFieldAccuracy = accuracy; break;
+            case Sensor.TYPE_GRAVITY:
+                break;
+            case Sensor.TYPE_MAGNETIC_FIELD:
+                break;
         }
     }
 
@@ -244,8 +262,13 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
         if(mDebug) {Log.d(LOG_TAG, "onLocationChanged() -> " + location.getLatitude() + ", " + location.getLongitude());}
         this.currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
+        this.prefs.edit()
+                .putFloat(Constants.PREFERENCE_KEY_LATITUDE, (float) location.getLatitude())
+                .putFloat(Constants.PREFERENCE_KEY_LONGITUDE, (float) location.getLongitude())
+                .apply();
+
         // The problem is that not every GPS location does have a street-view available.
-        // if (this.panorama != null) {this.panorama.setPosition(this.currentLocation);}
+        if (this.panorama != null) {this.panorama.setPosition(this.currentLocation);}
     }
 
     /**
@@ -253,7 +276,7 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
      * considered as always in the {@link LocationProvider#AVAILABLE} state.
      */
     @Override
-    @SuppressWarnings("deprecation")
+    @SuppressWarnings({"deprecation", "RedundantSuppression"})
     public void onStatusChanged(String provider, int status, Bundle extras) {}
 
     /** GPS: When the sensor had been enabled. */
@@ -268,6 +291,7 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
 
     /** GPS: When the sensor had been disabled. */
     @Override
+    @SuppressLint("MissingPermission")
     public void onProviderDisabled(String provider) {
         if(mDebug) {
             Toast.makeText(StreetViewActivity.this, provider.toUpperCase() + " disabled.", Toast.LENGTH_SHORT).show();
@@ -294,7 +318,7 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
         this.updateZoom(orientation, zoomLevel);
     }
 
-    /** toggles the zoom-level */
+    /** Toggles the zoom-level */
     @Override
     public void onStreetViewPanoramaLongClick(@NonNull StreetViewPanoramaOrientation orientation) {
         float zoomLevel = this.panorama.getPanoramaCamera().zoom;
@@ -307,14 +331,12 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case 200:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    requestLocationUpdates();
-                } else if (mDebug) {
-                    Toast.makeText(StreetViewActivity.this, "Permission was denied", Toast.LENGTH_LONG).show();
-                }
-                break;
+        if (requestCode == 200) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                requestLocationUpdates();
+            } else if (mDebug) {
+                Toast.makeText(StreetViewActivity.this, "Permission was denied", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -335,6 +357,7 @@ public class StreetViewActivity extends FragmentActivity implements LocationList
         }
     }
 
+    @SuppressLint("MissingPermission")
     private void requestLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             this.mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_REFRESH_TIME, LOCATION_REFRESH_DISTANCE, this);

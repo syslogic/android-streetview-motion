@@ -6,7 +6,6 @@ plugins {
 }
 
 android {
-
     defaultConfig {
         applicationId rootProject.ext.get('applicationId')
         versionName rootProject.ext.get('versionName')
@@ -15,7 +14,9 @@ android {
         targetSdk rootProject.ext.get('targetSdkVersion')
         minSdk rootProject.ext.get('minSdkVersion')
         manifestPlaceholders = [ crashlyticsEnabled: false ]
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+        testBuildType 'debug'
+        multiDexEnabled true
     }
     buildTypes {
 
@@ -49,9 +50,13 @@ android {
 
 dependencies {
 
-    implementation "androidx.appcompat:appcompat:1.4.1"
-    implementation "com.google.android.gms:play-services-location:19.0.1"
-    implementation "com.google.android.gms:play-services-maps:18.0.2"
+    implementation "androidx.appcompat:appcompat:1.5.0"
+    implementation ('androidx.preference:preference:1.2.0') {
+        exclude group: 'androidx.lifecycle', module: 'lifecycle-viewmodel-ktx'
+    }
+
+    implementation "com.google.android.gms:play-services-location:20.0.0"
+    implementation "com.google.android.gms:play-services-maps:18.1.0"
 
     // https://mvnrepository.com/artifact/androidx.test
     androidTestImplementation "androidx.test:core:1.4.0"
