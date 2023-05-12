@@ -6,6 +6,7 @@ plugins {
 }
 
 android {
+    namespace rootProject.ext.get('applicationId')
     defaultConfig {
         applicationId rootProject.ext.get('applicationId')
         versionName rootProject.ext.get('versionName')
@@ -18,8 +19,22 @@ android {
         testBuildType 'debug'
         multiDexEnabled true
     }
-    buildTypes {
 
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    dependenciesInfo {
+        includeInBundle true
+        includeInApk true
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    buildTypes {
         debug {
             // applicationIdSuffix '.debug'
             // signingConfig signingConfigs.debug
