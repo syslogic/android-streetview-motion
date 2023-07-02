@@ -21,8 +21,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     dependenciesInfo {
@@ -72,6 +72,13 @@ dependencies {
 
     implementation "com.google.android.gms:play-services-location:21.0.1"
     implementation "com.google.android.gms:play-services-maps:18.1.0"
+
+    // jUnit
+    testImplementation "junit:junit:4.13.2"
+
+    // Required for connected tests.
+    // https://mvnrepository.com/artifact/androidx.test/monitor
+    debugImplementation "androidx.test:monitor:1.6.1"
 
     // https://mvnrepository.com/artifact/androidx.test
     androidTestImplementation "androidx.test:core:1.5.0"
