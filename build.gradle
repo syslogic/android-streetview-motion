@@ -1,7 +1,7 @@
 // project-wide `build.gradle`
 
 plugins {
-    id 'com.android.application' version '8.0.2' apply false
+    id 'com.android.application' version '8.1.0' apply false
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin' version '2.0.1' apply false
 }
 
@@ -22,16 +22,18 @@ allprojects {
 
     // when projects were evaluated
     gradle.projectsEvaluated {
-        tasks.withType(JavaCompile) {
-            options.compilerArgs << "-Xmaxerrs" << "2000" << "-Xmaxwarns" << "2000"
-            options.compilerArgs << "-Xlint:unchecked" << '-Xlint:deprecation'
-            // << "-Xlint:-cast" << "-Xlint:all"
+        tasks.withType(JavaCompile).tap {
+            configureEach {
+                options.compilerArgs << "-Xmaxerrs" << "2000" << "-Xmaxwarns" << "2000"
+                options.compilerArgs << "-Xlint:unchecked" << '-Xlint:deprecation'
+                // << "-Xlint:-cast" << "-Xlint:all"
+            }
         }
     }
 }
 
 // rootProject > clean
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
 
     // delete build directories
     delete rootProject.buildDir

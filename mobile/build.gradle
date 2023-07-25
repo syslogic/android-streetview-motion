@@ -36,13 +36,12 @@ android {
 
     buildTypes {
         debug {
-            // applicationIdSuffix '.debug'
+            applicationIdSuffix '.debug'
             // signingConfig signingConfigs.debug
             testCoverageEnabled = false
             minifyEnabled false
             debuggable true
             jniDebuggable true
-            zipAlignEnabled true
             renderscriptDebuggable true
             pseudoLocalesEnabled false
             shrinkResources false
@@ -53,7 +52,6 @@ android {
             proguardFile "${project.rootDir}/proguard/default.pro"
             testCoverageEnabled false
             minifyEnabled true
-            zipAlignEnabled true
             shrinkResources true
             pseudoLocalesEnabled false
             renderscriptDebuggable false
