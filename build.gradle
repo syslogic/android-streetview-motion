@@ -1,7 +1,8 @@
 // project-wide `build.gradle`
 
 plugins {
-    id 'com.android.application' version '8.1.1' apply false
+    id 'com.android.application' version '8.2.0' apply false
+    // https://developers.google.com/maps/documentation/android-sdk/secrets-gradle-plugin
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin' version '2.0.1' apply false
 }
 
@@ -29,22 +30,5 @@ allprojects {
                 // << "-Xlint:-cast" << "-Xlint:all"
             }
         }
-    }
-}
-
-// rootProject > clean
-tasks.register('clean', Delete) {
-
-    // delete build directories
-    delete rootProject.buildDir
-    delete project.buildDir
-
-    // when task clean has finished
-    doLast {
-
-        // then recreate APK output directories
-        mkdir("${project.buildDir}/outputs/apk")
-        mkdir("${project.buildDir}/outputs/apk/debug")
-        mkdir("${project.buildDir}/outputs/apk/release")
     }
 }
