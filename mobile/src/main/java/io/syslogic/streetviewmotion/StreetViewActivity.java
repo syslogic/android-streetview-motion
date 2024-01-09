@@ -36,12 +36,10 @@ import androidx.preference.PreferenceManager;
  * StreetView {@link FragmentActivity}
  * @author Martin Zeitler
  */
-public class StreetViewActivity extends FragmentActivity
-        implements LocationListener, SensorEventListener,
-        StreetViewPanorama.OnStreetViewPanoramaChangeListener,
-        StreetViewPanorama.OnStreetViewPanoramaCameraChangeListener,
-        StreetViewPanorama.OnStreetViewPanoramaClickListener,
-        StreetViewPanorama.OnStreetViewPanoramaLongClickListener {
+public class StreetViewActivity extends FragmentActivity implements
+        StreetViewPanorama.OnStreetViewPanoramaChangeListener, StreetViewPanorama.OnStreetViewPanoramaCameraChangeListener,
+        StreetViewPanorama.OnStreetViewPanoramaClickListener, StreetViewPanorama.OnStreetViewPanoramaLongClickListener,
+        LocationListener, SensorEventListener {
 
     /** {@link Log} Tag */
     private static final String LOG_TAG = StreetViewActivity.class.getSimpleName();
@@ -99,19 +97,19 @@ public class StreetViewActivity extends FragmentActivity
             });
         }
 
-        /* GPS */
-        this.mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-        if (this.mLocationManager != null) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
-            } else {
-                this.requestLocationUpdates();
-            }
-        }
-
         /* Network */
         if (! this.isConnected()) {
             Toast.makeText(StreetViewActivity.this, "A network connection is required", Toast.LENGTH_LONG).show();
+        }
+
+        /* GPS */
+        this.mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (this.mLocationManager != null) {
+            if (this.hasCoarseLocationPermission() && this.hasFineLocationPermission()) {
+                this.requestLocationUpdates();
+            } else {
+                this.requestFineLocationPermission();
+            }
         }
     }
 
@@ -126,7 +124,7 @@ public class StreetViewActivity extends FragmentActivity
     @Override
     protected void onPause() {
         super.onPause();
-        if(this.mSensorManager != null) {
+        if (this.mSensorManager != null) {
             this.mSensorManager.unregisterListener(this);
         }
     }
@@ -137,24 +135,55 @@ public class StreetViewActivity extends FragmentActivity
         super.onResume();
         this.mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (this.mSensorManager != null) {
-
-            Sensor mRotationSensor = this.mSensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
-            this.mSensorManager.registerListener(this, mRotationSensor, SensorManager.SENSOR_DELAY_UI);
-
-            Sensor accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            if (accelerometer != null) {
-                this.mSensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
-            }
-
-            Sensor magneticField = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-            if (magneticField != null) {
-                this.mSensorManager.registerListener(this, magneticField, SensorManager.SENSOR_DELAY_NORMAL, SensorManager.SENSOR_DELAY_UI);
-            }
+            this.registerRotationSensorListener();
+            this.registerAccelerometerListener();
+            this.registerMagneticFieldListener();
         }
     }
 
-    /** Sensor Changed
-     * @noinspection CommentedOutCode*/
+    private void registerRotationSensorListener() {
+        Sensor sensor = getSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
+        if (sensor != null) {
+            this.mSensorManager.registerListener(
+                    StreetViewActivity.this,
+                    sensor,
+                    SensorManager.SENSOR_DELAY_UI
+            );
+        }
+    }
+
+    private void registerAccelerometerListener() {
+        Sensor sensor = getSensor(Sensor.TYPE_ACCELEROMETER);
+        if (sensor != null) {
+            this.mSensorManager.registerListener(
+                    StreetViewActivity.this,
+                    sensor,
+                    SensorManager.SENSOR_DELAY_NORMAL,
+                    SensorManager.SENSOR_DELAY_UI
+            );
+        }
+    }
+
+    private void registerMagneticFieldListener() {
+        Sensor sensor = getSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        if (sensor != null) {
+            this.mSensorManager.registerListener(
+                    StreetViewActivity.this,
+                    sensor,
+                    SensorManager.SENSOR_DELAY_NORMAL,
+                    SensorManager.SENSOR_DELAY_UI
+            );
+        }
+    }
+
+    private Sensor getSensor(int sensorId) {
+        return this.mSensorManager.getDefaultSensor(sensorId);
+    }
+
+    /**
+     * Sensor Changed
+     * @noinspection CommentedOutCod
+     */
     @Override
     public void onSensorChanged(@NonNull SensorEvent event) {
 
@@ -234,7 +263,7 @@ public class StreetViewActivity extends FragmentActivity
     @Override
     public void onAccuracyChanged(@NonNull Sensor sensor, int accuracy) {
         int SensorType = sensor.getType();
-        switch(SensorType) {
+        switch (SensorType) {
             case Sensor.TYPE_GRAVITY:
                 break;
             case Sensor.TYPE_MAGNETIC_FIELD:
@@ -311,6 +340,10 @@ public class StreetViewActivity extends FragmentActivity
         this.updateZoom(orientation, zoomLevel);
     }
 
+    private SupportStreetViewPanoramaFragment getStreetViewPanoramaFragment() {
+        return (SupportStreetViewPanoramaFragment) getSupportFragmentManager().findFragmentById(R.id.street_view_panorama);
+    }
+
     /** Request Permissions Result */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -319,7 +352,7 @@ public class StreetViewActivity extends FragmentActivity
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 requestLocationUpdates();
             } else if (mDebug) {
-                Toast.makeText(StreetViewActivity.this, "Permission was denied", Toast.LENGTH_LONG).show();
+                Toast.makeText(StreetViewActivity.this, "Permission request was denied", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -341,18 +374,6 @@ public class StreetViewActivity extends FragmentActivity
         }
     }
 
-    private SupportStreetViewPanoramaFragment getStreetViewPanoramaFragment() {
-        return (SupportStreetViewPanoramaFragment) getSupportFragmentManager().findFragmentById(R.id.street_view_panorama);
-    }
-
-    private boolean hasCoarseLocationPermission() {
-        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-    }
-
-    private boolean hasFineLocationPermission() {
-        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
-    }
-
     @SuppressLint("MissingPermission")
     private void requestLocationUpdates() {
         if (this.hasCoarseLocationPermission() && this.hasFineLocationPermission()) {
@@ -360,8 +381,22 @@ public class StreetViewActivity extends FragmentActivity
                     LocationManager.GPS_PROVIDER,
                     Constants.LOCATION_MANAGER_REFRESH_INTERVAL,
                     Constants.LOCATION_MANAGER_REFRESH_DISTANCE,
-                    this
+                    StreetViewActivity.this
             );
         }
+    }
+
+    private boolean hasCoarseLocationPermission() {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+    private boolean hasFineLocationPermission() {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+    /** @noinspection unused */
+    private void requestCoarseLocationPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 100);
+    }
+    private void requestFineLocationPermission() {
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 200);
     }
 }
