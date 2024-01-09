@@ -35,7 +35,6 @@ import androidx.preference.PreferenceManager;
 /**
  * StreetView {@link FragmentActivity}
  * @author Martin Zeitler
- * @version 1.0.1
  */
 public class StreetViewActivity extends FragmentActivity
         implements LocationListener, SensorEventListener,
