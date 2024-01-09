@@ -51,54 +51,51 @@ public class StreetViewActivity extends FragmentActivity
     protected static final boolean mDebug = BuildConfig.DEBUG;
 
     /** Shared Preferences */
-    private SharedPreferences prefs;
-
-    private StreetViewPanorama panorama = null;
+    private SharedPreferences prefs = null;
     private LocationManager mLocationManager = null;
     private SensorManager mSensorManager = null;
-    private Sensor mRotationSensor;
 
+    /** @noinspection MismatchedReadAndWriteOfArray */
     private final float[] mRotationReading = new float[3];
     private final float[] mAccelerometerReading = new float[3];
     private final float[] mMagnetometerReading = new float[3];
     private final float[] mOrientationAngles = new float[3];
     private final float[] mRotationMatrix = new float[9];
 
+    private StreetViewPanorama mPanorama = null;
     private StreetViewPanoramaOrientation currentOrientation;
     private LatLng currentLocation;
-
     private float currentBearing = 0;
     private float currentTilt    = 0;
-
-    private final int LOCATION_REFRESH_TIME = 1000;
-    private final int LOCATION_REFRESH_DISTANCE = 10;;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.fragment_street_view);
-
         this.prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        double latitude = this.prefs.getFloat(Constants.PREFERENCE_KEY_LATITUDE, 48.1429469F);
-        double longitude = this.prefs.getFloat(Constants.PREFERENCE_KEY_LONGITUDE, 11.5800361F);
-        this.currentLocation = new LatLng(latitude, longitude);
 
-        /* Street-View Panorama Fragment */
-        SupportStreetViewPanoramaFragment fragment = (SupportStreetViewPanoramaFragment) getSupportFragmentManager().findFragmentById(R.id.street_view_panorama);
-        if (fragment != null && this.panorama == null) {
+        /* Initial Location */
+        this.currentLocation = new LatLng(
+                this.prefs.getFloat(Constants.PREFERENCE_KEY_LATITUDE, Constants.PREFERENCE_DEFAULT_LATITUDE),
+                this.prefs.getFloat(Constants.PREFERENCE_KEY_LONGITUDE, Constants.PREFERENCE_DEFAULT_LONGITUDE)
+        );
+
+        /* StreetView Panorama Fragment */
+        SupportStreetViewPanoramaFragment fragment = getStreetViewPanoramaFragment();
+        if (fragment != null && this.mPanorama == null) {
             fragment.getStreetViewPanoramaAsync(streetViewPanorama -> { // OnStreetViewPanoramaReadyCallback
 
-                this.panorama = streetViewPanorama;
-                // this.panorama.setUserNavigationEnabled(false);
-                // this.panorama.setPanningGesturesEnabled(false);
-                this.panorama.setOnStreetViewPanoramaCameraChangeListener(StreetViewActivity.this);
-                this.panorama.setOnStreetViewPanoramaCameraChangeListener(StreetViewActivity.this);
-                this.panorama.setOnStreetViewPanoramaLongClickListener(StreetViewActivity.this);
-                this.panorama.setOnStreetViewPanoramaClickListener(StreetViewActivity.this);
+                this.mPanorama = streetViewPanorama;
+                // this.mPanorama.setUserNavigationEnabled(false);
+                // this.mPanorama.setPanningGesturesEnabled(false);
+                this.mPanorama.setOnStreetViewPanoramaCameraChangeListener(StreetViewActivity.this);
+                this.mPanorama.setOnStreetViewPanoramaCameraChangeListener(StreetViewActivity.this);
+                this.mPanorama.setOnStreetViewPanoramaLongClickListener(StreetViewActivity.this);
+                this.mPanorama.setOnStreetViewPanoramaClickListener(StreetViewActivity.this);
 
                 /* Set the panorama to the default location upon startup */
                 if (savedInstanceState == null) {
-                    this.panorama.setPosition(this.currentLocation, StreetViewSource.DEFAULT);
+                    this.mPanorama.setPosition(this.currentLocation, StreetViewSource.DEFAULT);
                 }
             });
         }
@@ -119,7 +116,8 @@ public class StreetViewActivity extends FragmentActivity
         }
     }
 
-    @SuppressLint("MissingPermission")
+    @SuppressLint({"deprecation", "MissingPermission"})
+    @SuppressWarnings({"deprecation", "RedundantSuppression"})
     boolean isConnected() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         android.net.NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
@@ -141,8 +139,8 @@ public class StreetViewActivity extends FragmentActivity
         this.mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         if (this.mSensorManager != null) {
 
-            this.mRotationSensor = this.mSensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
-            this.mSensorManager.registerListener(this, this.mRotationSensor, SensorManager.SENSOR_DELAY_UI);
+            Sensor mRotationSensor = this.mSensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
+            this.mSensorManager.registerListener(this, mRotationSensor, SensorManager.SENSOR_DELAY_UI);
 
             Sensor accelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
             if (accelerometer != null) {
@@ -156,20 +154,18 @@ public class StreetViewActivity extends FragmentActivity
         }
     }
 
-    /** Sensor Changed */
+    /** Sensor Changed
+     * @noinspection CommentedOutCode*/
     @Override
     public void onSensorChanged(@NonNull SensorEvent event) {
 
         switch (event.sensor.getType()) {
-            case Sensor.TYPE_GAME_ROTATION_VECTOR:
-                System.arraycopy(event.values, 0, mRotationReading, 0, mRotationReading.length);
-                break;
-            case Sensor.TYPE_ACCELEROMETER:
-                System.arraycopy(event.values, 0, mAccelerometerReading, 0, mAccelerometerReading.length);
-                break;
-            case Sensor.TYPE_MAGNETIC_FIELD:
-                System.arraycopy(event.values, 0, mMagnetometerReading, 0, mMagnetometerReading.length);
-                break;
+            case Sensor.TYPE_GAME_ROTATION_VECTOR ->
+                    System.arraycopy(event.values, 0, mRotationReading, 0, mRotationReading.length);
+            case Sensor.TYPE_ACCELEROMETER ->
+                    System.arraycopy(event.values, 0, mAccelerometerReading, 0, mAccelerometerReading.length);
+            case Sensor.TYPE_MAGNETIC_FIELD ->
+                    System.arraycopy(event.values, 0, mMagnetometerReading, 0, mMagnetometerReading.length);
         }
 
         // Compute the three orientation angles based on the most recent readings from the device's accelerometer and magnetometer.
@@ -183,11 +179,11 @@ public class StreetViewActivity extends FragmentActivity
         // "mOrientationAngles" now has up-to-date information.
 
         /* in case the view had not yet been initialized. */
-        if (this.panorama != null) {
+        if (this.mPanorama != null) {
 
             float x = 0.0f;
             float y = 0.0f;
-            float z = 0.0f;
+            // float z = 0.0f;
             switch (event.sensor.getType()) {
 
                 case Sensor.TYPE_GAME_ROTATION_VECTOR:
@@ -209,12 +205,12 @@ public class StreetViewActivity extends FragmentActivity
                     break;
             }
 
-            this.currentOrientation = this.panorama.getPanoramaCamera().getOrientation();
-            Point point = this.panorama.orientationToPoint(this.currentOrientation);
+            this.currentOrientation = this.mPanorama.getPanoramaCamera().getOrientation();
+            Point point = this.mPanorama.orientationToPoint(this.currentOrientation);
             if (point != null) {
 
                 /* the tilt needs to be in between -90 and 90 inclusive */
-                StreetViewPanoramaCamera camera = this.panorama.getPanoramaCamera();
+                StreetViewPanoramaCamera camera = this.mPanorama.getPanoramaCamera();
                 if((camera.tilt + y) >= -90 && (camera.tilt + y) <= 90) {
 
                     /* no clue why bearing-x & tilt+y, but it works */
@@ -222,7 +218,7 @@ public class StreetViewActivity extends FragmentActivity
                     this.currentTilt = camera.tilt + y; // roll
                     float currentZoom = camera.zoom;
 
-                    this.panorama.animateTo(new StreetViewPanoramaCamera
+                    this.mPanorama.animateTo(new StreetViewPanoramaCamera
                         .Builder()
                         .orientation(this.currentOrientation)
                         .zoom(currentZoom)
@@ -249,7 +245,7 @@ public class StreetViewActivity extends FragmentActivity
 
     /** GPS onLocationChanged() */
     @Override
-    public void onLocationChanged(Location location) {
+    public void onLocationChanged(@NonNull Location location) {
         if (mDebug) {Log.d(LOG_TAG, "onLocationChanged() -> " + location.getLatitude() + ", " + location.getLongitude());}
         this.prefs.edit()
                 .putFloat(Constants.PREFERENCE_KEY_LATITUDE, (float) location.getLatitude())
@@ -258,7 +254,7 @@ public class StreetViewActivity extends FragmentActivity
 
         // The problem is that not every GPS location does have a street-view available.
         this.currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
-        if (this.panorama != null) {this.panorama.setPosition(this.currentLocation);}
+        if (this.mPanorama != null) {this.mPanorama.setPosition(this.currentLocation);}
     }
 
     /**
@@ -271,7 +267,7 @@ public class StreetViewActivity extends FragmentActivity
 
     /** GPS: When the sensor had been enabled. */
     @Override
-    public void onProviderEnabled(String provider) {
+    public void onProviderEnabled(@NonNull String provider) {
         if (mDebug) {
             Toast.makeText(StreetViewActivity.this, provider.toUpperCase() + " enabled.", Toast.LENGTH_SHORT).show();
             Log.d(LOG_TAG, provider + ".onProviderEnabled(\"" + provider.toUpperCase() + "\")");
@@ -282,7 +278,7 @@ public class StreetViewActivity extends FragmentActivity
     /** GPS: When the sensor had been disabled. */
     @Override
     @SuppressLint("MissingPermission")
-    public void onProviderDisabled(String provider) {
+    public void onProviderDisabled(@NonNull String provider) {
         if (mDebug) {
             Toast.makeText(StreetViewActivity.this, provider.toUpperCase() + " disabled.", Toast.LENGTH_SHORT).show();
             Log.d(LOG_TAG, provider + ".onProviderDisabled(\"" + provider.toUpperCase() + "\")");
@@ -303,7 +299,7 @@ public class StreetViewActivity extends FragmentActivity
 
     @Override
     public void onStreetViewPanoramaClick(@NonNull StreetViewPanoramaOrientation orientation) {
-        float zoomLevel = this.panorama.getPanoramaCamera().zoom;
+        float zoomLevel = this.mPanorama.getPanoramaCamera().zoom;
         if(zoomLevel < 2.0f) {zoomLevel += 0.5f;} else {zoomLevel = 0.0f;}
         this.updateZoom(orientation, zoomLevel);
     }
@@ -311,7 +307,7 @@ public class StreetViewActivity extends FragmentActivity
     /** Toggles the zoom-level */
     @Override
     public void onStreetViewPanoramaLongClick(@NonNull StreetViewPanoramaOrientation orientation) {
-        float zoomLevel = this.panorama.getPanoramaCamera().zoom;
+        float zoomLevel = this.mPanorama.getPanoramaCamera().zoom;
         if(zoomLevel < 2.0f) {zoomLevel += 0.5f;} else {zoomLevel = 0.0f;}
         this.updateZoom(orientation, zoomLevel);
     }
@@ -330,11 +326,11 @@ public class StreetViewActivity extends FragmentActivity
     }
 
     private void updateZoom(StreetViewPanoramaOrientation orientation, float zoomLevel) {
-        this.currentBearing = this.panorama.getPanoramaCamera().bearing;
-        this.currentTilt = this.panorama.getPanoramaCamera().tilt;
-        Point point = this.panorama.orientationToPoint(orientation);
+        this.currentBearing = this.mPanorama.getPanoramaCamera().bearing;
+        this.currentTilt = this.mPanorama.getPanoramaCamera().tilt;
+        Point point = this.mPanorama.orientationToPoint(orientation);
         if (point != null) {
-            this.panorama.animateTo(
+            this.mPanorama.animateTo(
                 new StreetViewPanoramaCamera.Builder()
                     .orientation(orientation)
                     .bearing(this.currentBearing)
@@ -346,10 +342,27 @@ public class StreetViewActivity extends FragmentActivity
         }
     }
 
+    private SupportStreetViewPanoramaFragment getStreetViewPanoramaFragment() {
+        return (SupportStreetViewPanoramaFragment) getSupportFragmentManager().findFragmentById(R.id.street_view_panorama);
+    }
+
+    private boolean hasCoarseLocationPermission() {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private boolean hasFineLocationPermission() {
+        return ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
     @SuppressLint("MissingPermission")
     private void requestLocationUpdates() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            this.mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_REFRESH_TIME, LOCATION_REFRESH_DISTANCE, this);
+        if (this.hasCoarseLocationPermission() && this.hasFineLocationPermission()) {
+            this.mLocationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER,
+                    Constants.LOCATION_MANAGER_REFRESH_INTERVAL,
+                    Constants.LOCATION_MANAGER_REFRESH_DISTANCE,
+                    this
+            );
         }
     }
 }
