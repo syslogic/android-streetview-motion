@@ -75,17 +75,11 @@ dependencies {
     testImplementation "junit:junit:4.13.2"
 
     // Required for connected tests.
-    // https://mvnrepository.com/artifact/androidx.test/monitor
     debugImplementation "androidx.test:monitor:1.6.1"
 
-    // https://mvnrepository.com/artifact/androidx.test
     androidTestImplementation "androidx.test:core:1.5.0"
     androidTestImplementation "androidx.test:runner:1.5.2"
     androidTestImplementation "androidx.test:rules:1.5.0"
-
-    // https://mvnrepository.com/artifact/androidx.test.ext
     androidTestImplementation "androidx.test.ext:junit:1.1.5"
-
-    // https://mvnrepository.com/artifact/androidx.test.espresso
     androidTestImplementation "androidx.test.espresso:espresso-core:3.5.1"
 }
