@@ -28,7 +28,7 @@ allprojects {
             if (requested.group == 'org.jetbrains.kotlin') {
                 List<String> list = ['kotlin-stdlib', 'kotlin-stdlib-jdk7', 'kotlin-stdlib-jdk8', 'kotlin-stdlib-common']
                 if (list.contains(requested.name)) {
-                    details.useVersion "1.9.21"
+                    details.useVersion "1.9.22"
                 }
             }
         }
