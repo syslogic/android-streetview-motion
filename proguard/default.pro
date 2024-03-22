@@ -20,6 +20,4 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keepclassmembers class com.google.android.gms.internal.location.zze {
-    public static ** Companion;
-}
+-keep class com.google.android.gms.internal.location.zze$Companion { *; }
