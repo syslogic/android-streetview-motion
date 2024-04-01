@@ -68,7 +68,10 @@ dependencies {
         exclude group: 'androidx.lifecycle', module: 'lifecycle-viewmodel-ktx'
     }
 
-    /* Google Play Services: Location & Maps */
+    /*
+     * Google Play Services: Location & Maps
+     * https://issuetracker.google.com/issues/327611582
+     */
     implementation libs.bundles.google.play.services
 
     /* jUnit */

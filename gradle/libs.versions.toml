@@ -20,7 +20,6 @@ mapsplatform_secrets              = { id = "com.google.android.libraries.mapspla
 
 [libraries]
 junit                             = { module = "junit:junit", version.ref = "junit" }
-# https://issuetracker.google.com/issues/327611582
 google_play_services_location     = { module = "com.google.android.gms:play-services-location", version.ref = "google_play_services_location" }
 google_play_services_maps         = { module = "com.google.android.gms:play-services-maps", version.ref = "google_play_services_maps" }
 androidx_appcompat                = { module = "androidx.appcompat:appcompat", version.ref = "androidx_appcompat" }
