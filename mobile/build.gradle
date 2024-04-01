@@ -68,18 +68,14 @@ dependencies {
         exclude group: 'androidx.lifecycle', module: 'lifecycle-viewmodel-ktx'
     }
 
-    implementation libs.google.play.services.location
-    implementation libs.google.play.services.maps
+    /* Google Play Services: Location & Maps */
+    implementation libs.bundles.google.play.services
 
-    // jUnit
+    /* jUnit */
     testImplementation libs.junit
 
-    // Required for connected tests.
+    /* Required for connected tests. */
     debugImplementation libs.androidx.test.monitor
 
-    androidTestImplementation libs.androidx.test.core
-    androidTestImplementation libs.androidx.test.runner
-    androidTestImplementation libs.androidx.test.rules
-    androidTestImplementation libs.androidx.test.junit
-    androidTestImplementation libs.androidx.espresso.core
+    androidTestImplementation libs.bundles.androidx.test
 }
