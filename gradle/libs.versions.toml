@@ -1,17 +1,18 @@
 [versions]
-android_gradle_plugin             = '8.3.1'
+android_gradle_plugin             = '8.5.2'
 junit                             = '4.13.2'
 google_mapsplatform_secrets       = '2.0.1'
-google_play_services_location     = '21.2.0'
-google_play_services_maps         = '18.2.0'
-androidx_appcompat                = '1.6.1'
+google_play_services_location     = '21.3.0'
+google_play_services_maps         = '19.0.0'
+
+androidx_appcompat                = '1.7.0'
 androidx_preference               = '1.2.1'
-androidx_test_junit               = '1.1.5'
-androidx_test_core                = '1.5.0'
-androidx_test_rules               = '1.5.0'
-androidx_test_runner              = '1.5.2'
-androidx_test_monitor             = '1.6.1'
-androidx_test_espresso            = '3.5.1'
+androidx_test_junit               = '1.2.1'
+androidx_test_core                = '1.6.1'
+androidx_test_rules               = '1.6.1'
+androidx_test_runner              = '1.6.1'
+androidx_test_monitor             = '1.7.1'
+androidx_test_espresso            = '3.6.1'
 
 
 [plugins]
