@@ -11,10 +11,10 @@ android {
         applicationId rootProject.ext.get('applicationId')
         versionName rootProject.ext.get('versionName')
         versionCode rootProject.ext.get('versionCode')
-        compileSdk rootProject.ext.get('compileSdkVersion')
-        targetSdk rootProject.ext.get('targetSdkVersion')
-        minSdk rootProject.ext.get('minSdkVersion')
-        manifestPlaceholders = [ crashlyticsEnabled: false ]
+        compileSdk rootProject.ext.get('compileSdk')
+        targetSdk rootProject.ext.get('targetSdk')
+        minSdk rootProject.ext.get('minSdk')
+        manifestPlaceholders = [ MAPS_API_KEY: "", crashlyticsEnabled: false, ]
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         testBuildType 'debug'
         multiDexEnabled true
