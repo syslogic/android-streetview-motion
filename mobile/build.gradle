@@ -6,12 +6,12 @@ plugins {
 }
 
 android {
+    compileSdk rootProject.ext.get('compileSdk')
     namespace rootProject.ext.get('applicationId')
     defaultConfig {
         applicationId rootProject.ext.get('applicationId')
         versionName rootProject.ext.get('versionName')
         versionCode rootProject.ext.get('versionCode')
-        compileSdk rootProject.ext.get('compileSdk')
         targetSdk rootProject.ext.get('targetSdk')
         minSdk rootProject.ext.get('minSdk')
         manifestPlaceholders = [ MAPS_API_KEY: "", crashlyticsEnabled: false, ]

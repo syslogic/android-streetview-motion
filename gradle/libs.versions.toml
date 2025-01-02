@@ -1,5 +1,5 @@
 [versions]
-android_gradle_plugin             = '8.6.0'
+android_gradle_plugin             = '8.7.3'
 junit                             = '4.13.2'
 google_mapsplatform_secrets       = '2.0.1'
 google_play_services_location     = '21.3.0'
