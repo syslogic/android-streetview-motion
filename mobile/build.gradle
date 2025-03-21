@@ -6,18 +6,18 @@ plugins {
 }
 
 android {
-    compileSdk rootProject.ext.get('compileSdk')
-    namespace rootProject.ext.get('applicationId')
+    compileSdk = rootProject.ext.get('compileSdk')
+    namespace = rootProject.ext.get('applicationId')
     defaultConfig {
-        applicationId rootProject.ext.get('applicationId')
-        versionName rootProject.ext.get('versionName')
-        versionCode rootProject.ext.get('versionCode')
-        targetSdk rootProject.ext.get('targetSdk')
-        minSdk rootProject.ext.get('minSdk')
-        manifestPlaceholders = [ MAPS_API_KEY: "", crashlyticsEnabled: false, ]
-        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
-        testBuildType 'debug'
-        multiDexEnabled true
+        applicationId = rootProject.ext.get('applicationId')
+        versionName = rootProject.ext.get('versionName')
+        versionCode = rootProject.ext.get('versionCode')
+        targetSdk = rootProject.ext.get('targetSdk')
+        minSdk = rootProject.ext.get('minSdk')
+        manifestPlaceholders = [ MAPS_API_KEY: "", crashlyticsEnabled: false ]
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testBuildType = "debug"
+        multiDexEnabled = true
     }
 
     compileOptions {
@@ -26,12 +26,12 @@ android {
     }
 
     dependenciesInfo {
-        includeInBundle true
-        includeInApk true
+        includeInBundle = true
+        includeInApk = true
     }
 
     buildFeatures {
-        buildConfig true
+        buildConfig = true
     }
 
     buildTypes {
@@ -39,24 +39,22 @@ android {
             applicationIdSuffix '.debug'
             // signingConfig signingConfigs.debug
             testCoverageEnabled = false
-            minifyEnabled false
-            debuggable true
-            jniDebuggable true
-            renderscriptDebuggable true
-            pseudoLocalesEnabled false
-            shrinkResources false
+            minifyEnabled = false
+            debuggable = true
+            jniDebuggable = true
+            pseudoLocalesEnabled = false
+            shrinkResources = false
         }
 
         release {
             // signingConfig signingConfigs.release
             proguardFile "${project.rootDir}/proguard/default.pro"
-            testCoverageEnabled false
-            minifyEnabled true
-            shrinkResources true
-            pseudoLocalesEnabled false
-            renderscriptDebuggable false
-            jniDebuggable false
-            debuggable false
+            testCoverageEnabled = false
+            minifyEnabled = true
+            shrinkResources = true
+            pseudoLocalesEnabled = false
+            jniDebuggable = false
+            debuggable = false
         }
     }
 }
