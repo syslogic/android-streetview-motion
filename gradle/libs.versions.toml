@@ -1,10 +1,10 @@
 [versions]
-android_gradle_plugin         = '8.9.0'
+android_gradle_plugin         = '8.10.0'
 kotlin                        = '2.1.20'
 junit                         = '4.13.2'
 google_mapsplatform_secrets   = '2.0.1'
 google_play_services_location = '21.3.0'
-google_play_services_maps     = '19.1.0'
+google_play_services_maps     = '19.2.0'
 
 androidx_appcompat            = '1.7.0'
 androidx_preference           = '1.2.1'
@@ -14,7 +14,6 @@ androidx_test_rules           = '1.6.1'
 androidx_test_runner          = '1.6.2'
 androidx_test_monitor         = '1.7.2'
 androidx_test_espresso        = '3.6.1'
-
 
 [plugins]
 android_application           = { id = "com.android.application", version.ref = "android_gradle_plugin" }

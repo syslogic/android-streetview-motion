@@ -1,5 +1,4 @@
 // module :mobile
-
 plugins {
     id 'com.android.application'
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
@@ -21,8 +20,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     dependenciesInfo {
@@ -48,7 +47,7 @@ android {
 
         release {
             // signingConfig signingConfigs.release
-            proguardFile "${project.rootDir}/proguard/default.pro"
+            proguardFile("${project.rootDir}/proguard/default.pro")
             testCoverageEnabled = false
             minifyEnabled = true
             shrinkResources = true
@@ -61,22 +60,22 @@ android {
 
 dependencies {
 
-    implementation libs.androidx.appcompat
-    implementation (libs.androidx.preference) {
-        exclude group: 'androidx.lifecycle', module: 'lifecycle-viewmodel-ktx'
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.preference) {
+        exclude(group: "androidx.lifecycle", module: "lifecycle-viewmodel-ktx")
     }
 
     /*
      * Google Play Services: Location & Maps
      * https://issuetracker.google.com/issues/327611582
      */
-    implementation libs.bundles.google.play.services
+    implementation(libs.bundles.google.play.services)
 
     /* jUnit */
-    testImplementation libs.junit
+    testImplementation(libs.junit)
 
     /* Required for connected tests. */
-    debugImplementation libs.androidx.test.monitor
+    debugImplementation(libs.androidx.test.monitor)
 
-    androidTestImplementation libs.bundles.androidx.test
+    androidTestImplementation(libs.bundles.androidx.test)
 }
