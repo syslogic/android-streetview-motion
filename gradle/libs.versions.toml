@@ -1,5 +1,5 @@
 [versions]
-android_gradle_plugin         = '8.9.0'
+android_gradle_plugin         = '8.9.1'
 kotlin                        = '2.1.20'
 junit                         = '4.13.2'
 google_mapsplatform_secrets   = '2.0.1'
